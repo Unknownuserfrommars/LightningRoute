@@ -40,5 +40,5 @@ def home():
     return "Flask is running on Render!"
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # 读取 PORT 环境变量
+    port = int(os.environ.get("PORT", 5000))  # 读取 PORT 环境变量
     app.run(host="0.0.0.0", port=port)
