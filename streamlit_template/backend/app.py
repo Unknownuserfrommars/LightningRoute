@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from extract import GPTProcessor
 from graph import GraphGenerator
+import os
+from flask import Flask
 
 app = Flask(__name__)
 CORS(app)
@@ -30,6 +32,12 @@ def process_text():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Flask is running on Render!"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))  # 读取 PORT 环境变量
