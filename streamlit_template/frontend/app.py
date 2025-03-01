@@ -226,84 +226,46 @@ else:
 
 col1, col2 = st.columns([2,10])
 # Process button
-if col1.button("Generate Mind Map"):
+# Flask API 服务器地址
+FLASK_API_URL = "https://lightningroute.onrender.com"
+
+st.title("⚡ LightningRoute: AI-Powered Mind Mapping ⚡")
+
+# 选择输入方式
+input_type = st.radio("Choose input type:", ["Text Input", "File Upload"])
+
+text_input = ""
+
+if input_type == "Text Input":
+    text_input = st.text_area("Enter your text to generate a mind map:")
+else:
+    uploaded_file = st.file_uploader("Choose a text file", type=["txt"])
+    if uploaded_file is not None:
+        text_input = uploaded_file.getvalue().decode()
+
+if st.button("Generate Mind Map"):
     if text_input:
         with st.spinner("Generating mind map..."):
-            try:
-                # Call OpenAI API to process the text and generate mind map structure
-                prompt = f"""Given the following text, create a mind map structure. Extract key concepts and their relationships.
-                Format the response as a JSON with two arrays:
-                1. 'nodes': Each node has 'id' (unique string) and 'label' (displayed text)
-                2. 'edges': Each edge has 'from' and 'to' node IDs showing relationships
-                Root node should have id 'root'. Example format:
-                {{
-                    "nodes": [{{"id": "root", "label": "Main Topic"}}, {{"id": "1", "label": "Subtopic"}}],
-                    "edges": [{{"from": "root", "to": "1"}}]
-                }}
-                
-                Text to analyze:
-                {text_input}
-                """
-                # TODO: Add option for "New learners" and "Experienced learners" to the button
-                response = openai.ChatCompletion.create(
-                    model="gpt-4o",
-                    messages=[{
-                        "role": "system",
-                        "content": "You are a mind map generator that converts text into structured mind maps."
-                    }, {
-                        "role": "user",
-                        "content": prompt
-                    }],
-                    temperature=0.7,
-                    max_tokens=2000
-                )
-                
-                # Extract and parse the JSON response
-                try:
-                    gpt_response = response.choices[0].message.content
-                    # Debug: Show GPT's raw response
-                    # st.subheader("Debug: GPT Response")
-                    # st.text(gpt_response)
-                    #print(gpt_response)
-                    
-                    # Parse the JSON response
-                    gpt_response_trimmed = gpt_response.strip().replace("```json", "").replace("```", "").strip()
-                    graph_data = json.loads(gpt_response_trimmed)
-                except Exception as e:
-                    st.error(f"An error has occured while GPT is responding: {e}")
-                # Debug: Print raw text input
-                # st.subheader("Debug: Input Text")
-                # st.text_area("Raw Text Input", text_input, height=100)
-                
-                # Debug: Print graph data
-                # st.subheader("Debug: Graph Data")
-                # st.json(graph_data)
-                
-                # Create and display mind map
+            # 发送请求到 Flask 后端
+            response = requests.post(f"{FLASK_API_URL}/api/generate-map", json={"text": text_input})
+
+            if response.status_code == 200:
+                graph_data = response.json()
+
+                # 显示思维导图
                 st.subheader("Mind Map Visualization")
                 fig = create_mindmap_figure(graph_data)
                 st.plotly_chart(fig, use_container_width=True)
-                
-                # Add download button for the mind map
-                st.download_button(
-                    "Download Mind Map",
-                    data=json.dumps(graph_data),
-                    file_name="mindmap.json",
-                    mime="application/json"
-                )
-                if create_dir == "Yes":
-                    try:
-                        # Expand the path if it contains ~
-                        expanded_path = os.path.expanduser(dir_path)
-                        # Create directory structure
-                        root_dir = create_directory_from_mindmap(graph_data, expanded_path)
-                        st.success(f"Successfully created directory structure at: {root_dir}")
-                    except Exception as e:
-                        st.error(f"Error creating directory structure: {str(e)}")
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+
+                # 下载按钮
+                st.download_button("Download Mind Map", 
+                                   data=json.dumps(graph_data), 
+                                   file_name="mindmap.json", 
+                                   mime="application/json")
+            else:
+                st.error("Failed to generate mind map. Please try again.")
     else:
-        st.warning("Please enter some text or upload a file to generate a mind map.")
+        st.warning("Please enter text or upload a file.")
 
 # Add instructions in sidebar
 with st.sidebar:
