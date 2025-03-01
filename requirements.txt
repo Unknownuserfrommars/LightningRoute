@@ -7,3 +7,9 @@ streamlit
 python-dotenv==0.19.0
 requests==2.26.0
 gunicorn
+flask
+gunicorn
+networkx
+openai
+streamlit
+werkzeug==2.0.3
