@@ -1,4 +1,6 @@
 streamlit
+flask
+networkx
 plotly
 requests
 openai<1.0.0
