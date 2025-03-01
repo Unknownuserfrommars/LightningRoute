@@ -1,1 +1,7 @@
 streamlit
+plotly
+requests
+openai<1.0.0
+PyPDF2
+pytesseract
+Pillow
