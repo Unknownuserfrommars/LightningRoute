@@ -1,13 +1,26 @@
 # frontend/app.py
-import streamlit as st
-import plotly.graph_objects as go
-import requests
-import json
-import openai
-from utils import create_mindmap_figure
-import platform
-import getpass
-import os
+try:
+    import streamlit as st
+    import plotly.graph_objects as go
+    import requests
+    import json
+    import openai
+    from utils import create_mindmap_figure
+    import platform
+    import getpass
+    import os
+except ModuleNotFoundError:
+    import subprocess
+    subprocess.run(['pip', 'install', 'streamlit', 'plotly', 'requests', 'openai<1.0.0', 'pytesseract', 'PyPDF2', 'Pillow'])
+    import streamlit as st
+    import plotly.graph_objects as go
+    import requests
+    import json
+    import openai
+    from utils import create_mindmap_figure
+    import platform
+    import getpass
+    import os
 
 def create_directory_from_mindmap(graph_data, base_path):
     if not os.path.exists(base_path):
