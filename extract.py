@@ -12,7 +12,7 @@ class GPTProcessor:
         # print(f"Retrieved API Key: {self.api_key}")
 
         # Set the global openai.api_key directly
-        self.client = openai.Client(api_key=self.api_key)
+        # self.client = openai.Client(api_key=self.api_key)
 
     def extract_knowledge(self, text):
         try:
@@ -25,7 +25,7 @@ class GPTProcessor:
             """
             # TODO: Add option for "New learners" and "Experienced learners" to the button
             # Use the ChatCompletion endpoint
-            response = self.client.chat.completions.create(
+            response = openai.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {
